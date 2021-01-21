@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Xml.Linq;
@@ -8,12 +10,12 @@ using OpenCoverXmlProcessor.Model;
 
 namespace OpenCoverXmlProcessor
 {
-    class CoverXml
+    class CoverXmlProcessor
     {
         private readonly string filePath;
         private readonly XElement root;
 
-        public CoverXml(string filePath)
+        public CoverXmlProcessor(string filePath)
         {
             this.filePath = filePath;
             this.root = XElement.Load(filePath);
@@ -29,7 +31,7 @@ namespace OpenCoverXmlProcessor
                 {
                     string fullPath = file.Attribute("fullPath").Value;
                     string uid = file.Attribute("uid").Value;
-                    Diff fileDiff = jsonData.Diffs.SingleOrDefault(f => f.Path == fullPath);
+                    Diff fileDiff = jsonData.Diffs.SingleOrDefault(f => ActualPath(f.Path) == Path.GetFullPath(fullPath));
                     foreach (XElement method in module.XPathSelectElements("./Classes/Class/Methods/Method"))
                     {
                         if (method.Element("FileRef").Attribute("uid").Value == uid)
@@ -94,6 +96,13 @@ namespace OpenCoverXmlProcessor
             }
 
             elements.Clear();
+        }
+
+        private string ActualPath(string relativePath)
+        {
+            var combinedPath = Path.Combine(ConfigurationManager.AppSettings["RelativeRoot"], relativePath.TrimStart('/'));
+            var fullPath = Path.GetFullPath(combinedPath);
+            return fullPath;
         }
     }
 }
