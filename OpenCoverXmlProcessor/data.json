@@ -1,0 +1,13 @@
+{
+  "diffs": [
+    {
+      "path": "D:\\Projects\\Coverage\\AppUnderCoverlet\\Program.cs",
+      "lines": [
+        [
+          1,
+          10
+        ]
+      ]
+    }
+  ]
+}
